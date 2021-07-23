@@ -33,35 +33,35 @@ __iar_program_start
 main    
         BL init
 	
-        MOV R2, #00000011b ; m·scara PORTN e PORTJ bit 0 e 1
-        MOV R4, #00010001b ; m·scara PORTF bit 0 e 4
+        MOV R2, #00000011b ; m√°scara PORTN e PORTJ bit 0 e 1
+        MOV R4, #00010001b ; m√°scara PORTF bit 0 e 4
         MOV R1, #00000000b ; estado PORTN
         MOV R5, #00000000b ; estado PORTF 
- 	LDR R0, = GPIO_PORTN_DATA_R ; endereÁo PORTN
-        LDR R6, = GPIO_PORTF_DATA_R ; endereÁo PORTF
-        LDR R8, = GPIO_PORTJ_DATA_R ; endereÁo PORTJ
+ 	LDR R0, = GPIO_PORTN_DATA_R ; endere√ßo PORTN
+        LDR R6, = GPIO_PORTF_DATA_R ; endere√ßo PORTF
+        LDR R8, = GPIO_PORTJ_DATA_R ; endere√ßo PORTJ
         MOV R7, #0000 ; estado inicial contador
         
 
 loop	
         
         BL led
-        LDR R3, [R8, R2, LSL #2] ; Leitura dos botıes
+        LDR R3, [R8, R2, LSL #2] ; Leitura dos bot√µes
         EOR R3, #0011b
-        CBZ R3, theend ; Se n„o for zero, n„o foi pressionado nenhum bot„o
+        CBZ R3, theend ; Se for zero, n√£o foi pressionado nenhum bot√£o
         CMP R3, #1
         ITE EQ       ; se SW1 foi pressionado
           ADDEQ R7, #1
           SUBNE R7, #1 
 botao     
-        LDR R3, [R8, R2, LSL #2] ; Leitura dos botıes
+        LDR R3, [R8, R2, LSL #2] ; Leitura dos bot√µes
         EOR R3, #0011b
-        CBZ R3, theend ; se bot„o n„o estiver mais pressionado
+        CBZ R3, theend ; se bot√£o n√£o estiver mais pressionado
         BL delay
         B botao
                      
 theend  
-        AND R7, R7, #0001111b ; limpa bits n„o utilizados de R7
+        AND R7, R7, #0001111b ; limpa bits n√£o utilizados de R7
         B loop
 
 
@@ -79,7 +79,7 @@ cont    CBZ R0, enddalay ; 1 clock
 enddalay        
         POP {R0,PC}
 
-led     ;operaÁ„o de escrita nos leds D1-D4 de acordo com registrador R7 (contador)
+led     ;opera√ß√£o de escrita nos leds D1-D4 de acordo com registrador R7 (contador)
         AND R9, R7,#0001b
         MOV R1, R9, LSL #1 ;LED D1
         AND R9, R7, #0010b 
@@ -93,7 +93,7 @@ led     ;operaÁ„o de escrita nos leds D1-D4 de acordo com registrador R7 (contad
         STR R5, [R6, R4, LSL #2] ; aciona LED F com estado atual
         BX LR
 
-init    ;inicializaÁıes 
+init    ;inicializa√ß√µes 
         PUSH {LR}
         MOV R0, #PORTN_BIT  
         ORR R0, #PORTF_BIT 
@@ -104,12 +104,12 @@ init    ;inicializaÁıes
         LDR R0, =GPIO_PORTN_DIR_R
         LDR R1, =GPIO_PORTN_DEN_R
         MOV R2, #00000011b ; bit 0 e 1
-        BL Digital_O   ;configura saÌdas digitais PORTN
+        BL Digital_O   ;configura sa√≠das digitais PORTN
         
         LDR R0, =GPIO_PORTF_DIR_R
         LDR R1, =GPIO_PORTF_DEN_R
         MOV R2, #00010001b ; bit 0 e 4
-        BL Digital_O ;configura saÌdas digitais PORTF
+        BL Digital_O ;configura sa√≠das digitais PORTF
 
         LDR R0, =GPIO_PORTJ_DIR_R
         LDR R1, =GPIO_PORTJ_DEN_R
@@ -124,38 +124,38 @@ init    ;inicializaÁıes
         POP {PC}
 
 Hab_Port  ; Habilita clock para porta. 
-          ; Entrada: R0 - bit de endereÁo da porta (R0 destruÌdo)
+          ; Entrada: R0 - bit de endere√ßo da porta (R0 destru√≠do)
           PUSH {R1,LR} ; salva R1 e LR
-          LDR LR, =SYSCTL_RCGCGPIO_R ; busca do endereÁo RCGCGPIO para LR
+          LDR LR, =SYSCTL_RCGCGPIO_R ; busca do endere√ßo RCGCGPIO para LR
           LDR R1, [LR] ; leitura do estado anterior
           ORR R1, R0 ; habilita o port de R0
           STR R1, [LR] ; escrita do novo estado
 
-          LDR LR, =SYSCTL_PRGPIO_R ; busca do endereÁo RCGCGPIO para LR
+          LDR LR, =SYSCTL_PRGPIO_R ; busca do endere√ßo RCGCGPIO para LR
 wait	  LDR R0, [LR] ; leitura do estado atual
           TEQ R1, R0 ; clock do port N habilitado?
           BNE wait ; caso negativo, aguarda
           POP {R1,PC}  ;fim
           
-Digital_O ; Programa terminais como saÌda 
-          ; Entradas: R0, R1, R2 - sendo R0 endereÁo GPIODIR, R1 endereÁo GPIOEN, R2 bits de entrada ou saÌda
+Digital_O ; Programa terminais como sa√≠da 
+          ; Entradas: R0, R1, R2 - sendo R0 endere√ßo GPIODIR, R1 endere√ßo GPIOEN, R2 bits de entrada ou sa√≠da
           PUSH {LR}
           LDR LR, [R0] ; leitura do estado anterior
-          ORR LR, R2 ; bit de saÌda
+          ORR LR, R2 ; bit de sa√≠da
           STR LR, [R0] ; escrita do novo estado
           LDR LR, [R1] ; leitura do estado anterior
-          ORR LR, R2 ; habilita funÁ„o digital
+          ORR LR, R2 ; habilita fun√ß√£o digital
           STR LR, [R1] ; escrita do novo estado
           POP {PC}  ;fim
 
 Digital_I ; Programa terminais como entrada 
-          ; Entradas: R0, R1, R2 - sendo R0 endereÁo GPIODIR, R1 endereÁo GPIOEN, R2 bits de entrada ou saÌda
+          ; Entradas: R0, R1, R2 - sendo R0 endere√ßo GPIODIR, R1 endere√ßo GPIOEN, R2 bits de entrada ou sa√≠da
           PUSH {LR}
           LDR LR, [R0] ; leitura do estado anterior
           BIC LR, R2 ; configura bits de entrada
           STR LR, [R0] ; escrita do novo estado
           LDR LR, [R1] ; leitura do estado anterior
-          ORR LR, R2 ; habilita funÁ„o digital
+          ORR LR, R2 ; habilita fun√ß√£o digital
           STR LR, [R1] ; escrita do novo estado
           POP {PC}  ;fim
 
